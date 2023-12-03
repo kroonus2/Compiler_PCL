@@ -5,24 +5,41 @@ sg.theme('Dark Grey 10')
 
 # Create settings obj
 settings = sg.UserSettings()
+input_reg = [0, 0, 0, 0, 0, 0, 0, 0]
+output_reg = [0, 0, 0, 0, 0, 0, 0, 0]
 
 # All the stuff inside your window.
 
 layout_l = [
     [sg.Text('Lista de Instruções: ')],
-    [sg.Multiline(size=(50, 35), key='-CODE-')],
+    [sg.Multiline(size=(50, 33), key='-CODE-')],
     [sg.Button('Compilar'), sg.Button('Limpar')]
 ]
 
 layout_r = [
     [sg.Text('Entradas: ')],
-    [sg.Listbox(['I:1/0', 'I:1/1', 'I:1/2', 'I:1/3', 'I:1/4', 'I:1/5',
-                'I:1/6', 'I:1/7'], no_scrollbar=True, enable_events=True, s=(25, 16), select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, key='-INPUT-')],
+    [sg.Listbox([f'I:1/0  --  {input_reg[0]}',
+                 f'I:1/1  --  {input_reg[1]}',
+                 f'I:1/2  --  {input_reg[2]} ',
+                 f'I:1/3  --  {input_reg[3]}',
+                 f'I:1/4  --  {input_reg[4]}',
+                 f'I:1/5  --  {input_reg[5]}',
+                 f'I:1/6  --  {input_reg[6]}',
+                 f'I:1/7  --  {input_reg[7]}'],
+                no_scrollbar=True, enable_events=True, s=(25, 12), select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, key='-INPUT-')],
     [sg.Text('Saidas: ')],
-    [sg.Listbox(['O:2/0', 'O:2/1', 'O:2/2', 'O:2/3', 'O:2/4', 'O:2/5',
-                'O:2/6', 'O:2/7'], no_scrollbar=True, enable_events=True, select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, s=(25, 15), key='-OUTPUT-')],
-    [sg.Button("Add", enable_events=True, key="-ADDBTN-"),
-     sg.Button("Remover", enable_events=True, key="-REMOVEBTN-")]
+    [sg.Listbox([f'O:2/0  --  {output_reg[0]}',
+                 f'O:2/1  --  {output_reg[1]}',
+                 f'O:2/2  --  {output_reg[2]}',
+                 f'O:2/3  --  {output_reg[3]}',
+                 f'O:2/4  --  {output_reg[4]}',
+                 f'O:2/5  --  {output_reg[5]}',
+                 f'O:2/6  --  {output_reg[6]}',
+                 f'O:2/7  --  {output_reg[7]}'],
+                no_scrollbar=True, enable_events=True, select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, s=(25, 12), key='-OUTPUT-')],
+    [sg.Text('Tempo de varredura(ms): ')],
+    [sg.Input(key='-TIMEREAD-', s=(12, 1)),
+     sg.Button("Add", enable_events=True, key="-ADDBTN-")],
 ]
 
 menu_def = [['File', ['Abrir', 'Salvar',]],
@@ -32,7 +49,7 @@ layout = [[sg.Menu(menu_def)],
           [sg.Text('Compilador CLP',  font='_22',
                    justification='c', expand_x=True)],
           [sg.Col(layout_l), sg.Col(layout_r)],
-          [sg.Text('Status da Varredura: '), sg.StatusBar('', key='-STATUS-')],
+          #   [sg.Text('Status da Varredura: '), sg.StatusBar('', key='-STATUS-')],
           #   [sg.Text('Variáveis: ')],
           #   [sg.Multiline(s=(80, 10), key='-VARIABLES-')],
           ]
