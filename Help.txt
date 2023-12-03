@@ -1,0 +1,23 @@
+ A lista de instrucoes e uma das linguagens de programacao usadas em Controladores Logicos Programaveis (CLPs) para controlar maquinas e processos industriais1. A lista de instrucoes e uma linguagem textual que usa uma serie de comandos para controlar a logica, sequenciamento, temporizacao, contagem e aritmetica1. Aqui estao alguns exemplos de comandos em uma lista de instrucoes:
+
+LD "N"  - Carrega um valor em um registrador
+ST "N"  - Armazena o conteudo do acumulador no local especificado pelo operando 
+S       - Faz com que o valor do operando seja 1 
+R       - Faz com que o valor do operando seja 0 
+AND "N" - Realiza uma operacao logica AND
+OR  "N" - Realiza uma operacao logica OR
+XOR "N" - Realiza uma operacao logica XOR
+ADD - Adiciona dois valores
+SUB - Subtrai dois valores
+MUL - Multiplica dois valores
+DIV - Divide dois valores
+GT  - Comparacao (Greater Than) maior que (>)
+GE  - Comparacao (Greater or Equal) maior ou igual que (>=) 
+EQ  - Comparacao (Equl to) igual a (=)
+NE  - Comparacao (Not Equal) diferente de (< >)
+LT  - Comparacao (Less Than) menor que (<)
+LE  - Comparacao (Less or Equal) menor ou igual que (<=) 
+TON - Temporizador ligado
+TOF - Temporizador desligado
+RTO - Retorno do temporizador"
+
