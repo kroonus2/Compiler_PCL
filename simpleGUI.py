@@ -1,4 +1,5 @@
 import PySimpleGUI as sg
+import modBusComunication as mdC
 
 # Add a touch of color
 sg.theme('Dark Grey 10')
@@ -7,16 +8,19 @@ sg.theme('Dark Grey 10')
 settings = sg.UserSettings()
 input_reg = [0, 0, 0, 0, 0, 0, 0, 0]
 output_reg = [0, 0, 0, 0, 0, 0, 0, 0]
+# Get the list of serial ports
+serial_ports = mdC.listar_portas_seriais()
 
 # All the stuff inside your window.
-
 layout_l = [
     [sg.Text('Lista de Instruções: ')],
     [sg.Multiline(size=(50, 33), key='-CODE-')],
-    [sg.Button('Compilar'), sg.Button('Limpar')]
+    [sg.Button('Executar'), sg.Button('Limpar')]
 ]
 
 layout_r = [
+    [sg.Text('Porta Serial:'), sg.Combo(serial_ports,
+                                        key='-CHOOSE_PORT-', enable_events=True)],
     [sg.Text('Entradas: ')],
     [sg.Listbox([f'I:1/0  --  {input_reg[0]}',
                  f'I:1/1  --  {input_reg[1]}',
@@ -26,7 +30,7 @@ layout_r = [
                  f'I:1/5  --  {input_reg[5]}',
                  f'I:1/6  --  {input_reg[6]}',
                  f'I:1/7  --  {input_reg[7]}'],
-                no_scrollbar=True, enable_events=True, s=(25, 12), select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, key='-INPUT-')],
+                no_scrollbar=True, enable_events=True, s=(25, 11), select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, key='-INPUT-')],
     [sg.Text('Saidas: ')],
     [sg.Listbox([f'O:2/0  --  {output_reg[0]}',
                  f'O:2/1  --  {output_reg[1]}',
@@ -36,7 +40,7 @@ layout_r = [
                  f'O:2/5  --  {output_reg[5]}',
                  f'O:2/6  --  {output_reg[6]}',
                  f'O:2/7  --  {output_reg[7]}'],
-                no_scrollbar=True, enable_events=True, select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, s=(25, 12), key='-OUTPUT-')],
+                no_scrollbar=True, enable_events=True, select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, s=(25, 11), key='-OUTPUT-')],
     [sg.Text('Tempo de varredura(ms): ')],
     [sg.Input(key='-TIMEREAD-', s=(12, 1)),
      sg.Button("Add", enable_events=True, key="-ADDBTN-")],
@@ -49,9 +53,6 @@ layout = [[sg.Menu(menu_def)],
           [sg.Text('Compilador CLP',  font='_22',
                    justification='c', expand_x=True)],
           [sg.Col(layout_l), sg.Col(layout_r)],
-          #   [sg.Text('Status da Varredura: '), sg.StatusBar('', key='-STATUS-')],
-          #   [sg.Text('Variáveis: ')],
-          #   [sg.Multiline(s=(80, 10), key='-VARIABLES-')],
           ]
 
 
@@ -63,6 +64,14 @@ while True:
     event, values = window.read()
     if event == sg.WIN_CLOSED or event == 'Cancelar':  # if user closes window or clicks cancel
         break
+
+    elif event == '-CHOOSE_PORT-':
+        selected_port = values['-CHOOSE_PORT-']
+        instrument = mdC.obterInstrumento(selected_port)
+        if selected_port:
+            sg.popup(
+                f'Porta Selecionada: {selected_port}', title='Porta Selecionada')
+
     elif event == 'Ajuda':
         file = open("Help.txt")
         Helper = file.read()
