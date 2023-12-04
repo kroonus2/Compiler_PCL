@@ -1,5 +1,5 @@
 import PySimpleGUI as sg
-from modBusComunication import Modbus;
+from modBusComunication import Modbus
 import serial.tools.list_ports
 
 # Add a touch of color
@@ -7,11 +7,11 @@ sg.theme('Dark Grey 10')
 
 # Create settings obj
 settings = sg.UserSettings()
-input_reg = [0, 0, 0, 0, 0, 0, 0, 0]
-output_reg = [0, 0, 0, 0, 0, 0, 0, 0]
+output_reg = [1, 0, 1, 0, 1, 0, 1, 0]
 # Get the list of serial ports
 
 modbus = Modbus()
+
 
 def listar_portas_seriais():
     portas = list(serial.tools.list_ports.comports())
@@ -30,14 +30,14 @@ layout_r = [
     [sg.Text('Porta Serial:'), sg.Combo(listar_portas_seriais(),
                                         key='-CHOOSE_PORT-', enable_events=True)],
     [sg.Text('Entradas: ')],
-    [sg.Listbox([f'I:1/0  --  {input_reg[0]}',
-                 f'I:1/1  --  {input_reg[1]}',
-                 f'I:1/2  --  {input_reg[2]} ',
-                 f'I:1/3  --  {input_reg[3]}',
-                 f'I:1/4  --  {input_reg[4]}',
-                 f'I:1/5  --  {input_reg[5]}',
-                 f'I:1/6  --  {input_reg[6]}',
-                 f'I:1/7  --  {input_reg[7]}'],
+    [sg.Listbox([f'I:1/0  --  {modbus.input_reg[0]}',
+                 f'I:1/1  --  {modbus.input_reg[1]}',
+                 f'I:1/2  --  {modbus.input_reg[2]} ',
+                 f'I:1/3  --  {modbus.input_reg[3]}',
+                 f'I:1/4  --  {modbus.input_reg[4]}',
+                 f'I:1/5  --  {modbus.input_reg[5]}',
+                 f'I:1/6  --  {modbus.input_reg[6]}',
+                 f'I:1/7  --  {modbus.input_reg[7]}'],
                 no_scrollbar=True, enable_events=True, s=(25, 11), select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, key='-INPUT-')],
     [sg.Text('Saidas: ')],
     [sg.Listbox([f'O:2/0  --  {output_reg[0]}',
@@ -76,6 +76,17 @@ while True:
     elif event == '-CHOOSE_PORT-':
         selected_port = values['-CHOOSE_PORT-']
         modbus.get_instrument(selected_port)
+        modbus.read_input_registers()
+        window['-INPUT-'].Update(
+            [f'I:1/0  --  {modbus.input_reg[0]}',
+             f'I:1/1  --  {modbus.input_reg[1]}',
+             f'I:1/2  --  {modbus.input_reg[2]}',
+             f'I:1/3  --  {modbus.input_reg[3]}',
+             f'I:1/4  --  {modbus.input_reg[4]}',
+             f'I:1/5  --  {modbus.input_reg[5]}',
+             f'I:1/6  --  {modbus.input_reg[6]}',
+             f'I:1/7  --  {modbus.input_reg[7]}']
+        )
         if selected_port:
             sg.popup(
                 f'Porta Selecionada: {selected_port}', title='Porta Selecionada')
@@ -143,7 +154,8 @@ while True:
         if current_text:
             window['-CODE-'].update('')
 
-    elif event == 'Compilar':
-        print('Compilando...', values[0])
+    elif event == 'Executar':
+        print('Executando...')
+        modbus.write_output_registers(output_reg)
 
 window.close()
