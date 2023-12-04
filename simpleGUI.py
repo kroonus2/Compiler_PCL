@@ -1,5 +1,6 @@
 import PySimpleGUI as sg
-import modBusComunication as mdC
+from modBusComunication import Modbus;
+import serial.tools.list_ports
 
 # Add a touch of color
 sg.theme('Dark Grey 10')
@@ -9,7 +10,14 @@ settings = sg.UserSettings()
 input_reg = [0, 0, 0, 0, 0, 0, 0, 0]
 output_reg = [0, 0, 0, 0, 0, 0, 0, 0]
 # Get the list of serial ports
-serial_ports = mdC.listar_portas_seriais()
+
+modbus = Modbus()
+
+def listar_portas_seriais():
+    portas = list(serial.tools.list_ports.comports())
+    nomes_portas = [porta.device for porta in portas]
+    return nomes_portas
+
 
 # All the stuff inside your window.
 layout_l = [
@@ -19,7 +27,7 @@ layout_l = [
 ]
 
 layout_r = [
-    [sg.Text('Porta Serial:'), sg.Combo(serial_ports,
+    [sg.Text('Porta Serial:'), sg.Combo(listar_portas_seriais(),
                                         key='-CHOOSE_PORT-', enable_events=True)],
     [sg.Text('Entradas: ')],
     [sg.Listbox([f'I:1/0  --  {input_reg[0]}',
@@ -67,7 +75,7 @@ while True:
 
     elif event == '-CHOOSE_PORT-':
         selected_port = values['-CHOOSE_PORT-']
-        instrument = mdC.obterInstrumento(selected_port)
+        modbus.get_instrument(selected_port)
         if selected_port:
             sg.popup(
                 f'Porta Selecionada: {selected_port}', title='Porta Selecionada')
