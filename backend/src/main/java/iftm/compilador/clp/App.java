@@ -1,3 +1,5 @@
+package iftm.compilador.clp;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -5,14 +7,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import compiladores.lexico.Lexico;
-import semantico.Semantico;
-import sintatico.Sintatico;
+import iftm.compilador.clp.compiladores.lexico.Lexico;
+import iftm.compilador.clp.semantico.Semantico;
+import iftm.compilador.clp.sintatico.Sintatico;
 
 public class App {
 
     public static void main(String[] args) throws Exception {
-
         String nomeArquivo;
 
         if (args.length == 0) {
@@ -45,9 +46,10 @@ public class App {
 
 		String caminhoArquivo = Paths.get(nomeArquivo).toAbsolutePath().toString();
 
+        System.out.println(caminhoArquivo);
         Lexico lexico;
         
-		try (BufferedReader br = new BufferedReader(new FileReader(caminhoArquivo, StandardCharsets.UTF_8))) {
+		try (BufferedReader br = new BufferedReader(new FileReader(caminhoArquivo))) {
             
             lexico = new Lexico(br);
 

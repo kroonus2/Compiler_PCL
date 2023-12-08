@@ -1,4 +1,4 @@
-package compiladores.lexico;
+package iftm.compilador.clp.compiladores.lexico;
 
 import java.io.BufferedReader;
 import java.io.IOException;

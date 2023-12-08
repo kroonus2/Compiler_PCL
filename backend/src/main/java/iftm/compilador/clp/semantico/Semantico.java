@@ -1,4 +1,4 @@
-package semantico;
+package iftm.compilador.clp.semantico;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,15 +6,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import compiladores.lexico.Classe;
-import compiladores.lexico.Palavras;
-import compiladores.lexico.Token;
-import compiladores.lexico.Tokens;
+import javax.sound.sampled.Port;
+
+import iftm.compilador.clp.compiladores.lexico.Classe;
+import iftm.compilador.clp.compiladores.lexico.Palavras;
+import iftm.compilador.clp.compiladores.lexico.Token;
+import iftm.compilador.clp.compiladores.lexico.Tokens;
+import iftm.compilador.clp.thread.JSONReaderThread;
 
 public class Semantico {    
     private Token token;
     private int i = 0; 
     private Scanner scanner;
+    JSONReaderThread jsonReader = new JSONReaderThread();
 
     //estruturas de dados
     public static List<Integer> labels = new ArrayList<Integer>();
@@ -56,14 +60,14 @@ public class Semantico {
     private int value;
 
     public Semantico(){
-        //configurações iniciais do programa
+        jsonReader.run();
         scanner = new Scanner(System.in);         
         removeComments(); 
         processLabels();
         mapInstructions();                 
     }
 
-    public void run(){    
+    public void run() throws InterruptedException {    
         while (true) {   
             i = 0; //Indice que percorre a lista de Tokens        
             while(i < Tokens.size()){
@@ -80,15 +84,14 @@ public class Semantico {
                 error("Expressão inválida: abertura ou fechamento de parêntese esperado.");
             }
             
-            System.out.println("Acumulador: "+accumulator +" - Entrada Q1: "+ input_reg[1]);
-            System.out.println("Acumulador: "+accumulator +" - Entrada Q2: "+ input_reg[2]);
-            System.out.println("Acumulador: "+accumulator +" - Saída Q1: "+ output_reg[1]);
+            System.out.println("Acumulador: "+accumulator +" - Entrada Q1: "+ jsonReader.communicationData.INPUT[1]);
+            System.out.println("Acumulador: "+accumulator +" - Entrada Q2: "+ jsonReader.communicationData.INPUT[2]);
+            System.out.println("Acumulador: "+accumulator +" - Saída Q1: "+ jsonReader.communicationData.OUTPUT[1]);
             System.out.println("Acumulador: "+accumulator +" - Saída T1: "+ timers[1]);
             System.out.println("Acumulador: "+accumulator +" - PRESET T1: "+ timers_preset[1]);
             System.out.println("Acumulador: "+accumulator +" - OUTPUT T1: "+ timers_output[1]);
-
-            scanner.nextLine();
-
+            
+            Thread.sleep(1000);
         }
     }    
 
@@ -379,7 +382,7 @@ public class Semantico {
         if (register != null && type == TYPE_TIMER) {
             if(accumulator >= 1){
                 register[port] += 1;
-                if(register[port] == 200){
+                if(register[port] == timers_preset[port]){
                     timers_output[port] = 1;
                 }
                 accumulator = register[port];
@@ -397,7 +400,7 @@ public class Semantico {
         if (register != null && type == TYPE_TIMER) {
             if(accumulator >= 1){
                 register[port] += 1;
-                if(register[port] <= 200){
+                if(register[port] <= timers_preset[port]){
                     timers_output[port] = 1;
                 }else{
                     timers_output[port] = 0;
@@ -476,9 +479,9 @@ public class Semantico {
     private int[] getRegisterByType(int type) {
         switch (type) {
             case TYPE_INPUT:
-                return input_reg;
+                return jsonReader.communicationData.INPUT;
             case TYPE_OUTPUT:
-                return output_reg;
+                return jsonReader.communicationData.OUTPUT;
             case TYPE_MEMORY:
                 return memory_reg;
             case TYPE_COUNTER:
@@ -531,7 +534,7 @@ public class Semantico {
                 port = Integer.parseInt(num.replaceAll("[^0-9]", ""));
                 int maxLength = 0;  
                 if(type == TYPE_INPUT || type == TYPE_OUTPUT || type == TYPE_COUNTER){
-                    maxLength = input_reg.length - 1;
+                    maxLength = jsonReader.communicationData.INPUT.length - 1;
                 }else{
                     maxLength = memory_reg.length - 1;
                 }

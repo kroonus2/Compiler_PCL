@@ -1,4 +1,4 @@
-package compiladores.lexico;
+package iftm.compilador.clp.compiladores.lexico;
 
 
 public class Palavras {

@@ -1,9 +1,9 @@
 
-package sintatico;
+package iftm.compilador.clp.sintatico;
 import java.util.Scanner;
-import compiladores.lexico.Classe;
-import compiladores.lexico.Lexico;
-import compiladores.lexico.Token;
+import iftm.compilador.clp.compiladores.lexico.Classe;
+import iftm.compilador.clp.compiladores.lexico.Lexico;
+import iftm.compilador.clp.compiladores.lexico.Token;
 
 public class Sintatico {
 
