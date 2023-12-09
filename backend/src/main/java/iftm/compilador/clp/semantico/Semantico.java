@@ -84,7 +84,7 @@ public class Semantico {
                 error("Expressao invalida: abertura ou fechamento de parentese esperado.");
             }
             
-            Thread.sleep(1000);
+            Thread.sleep(1);
         }
     }    
 
