@@ -1,0 +1,12 @@
+iftm\compilador\clp\semantico\Semantico.class
+iftm\compilador\clp\compiladores\lexico\Classe.class
+iftm\compilador\clp\compiladores\lexico\Tokens.class
+iftm\compilador\clp\compiladores\lexico\Palavras.class
+iftm\compilador\clp\thread\Communication.class
+iftm\compilador\clp\thread\JSONReaderThread.class
+iftm\compilador\clp\compiladores\lexico\Token.class
+iftm\compilador\clp\compiladores\lexico\Valor$TipoValor.class
+iftm\compilador\clp\App.class
+iftm\compilador\clp\compiladores\lexico\Lexico.class
+iftm\compilador\clp\compiladores\lexico\Valor.class
+iftm\compilador\clp\sintatico\Sintatico.class

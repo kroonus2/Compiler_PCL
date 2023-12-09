@@ -24,14 +24,14 @@ public class JSONReaderThread extends Thread {
     private void readJSON() {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            Communication newCommunication = objectMapper.readValue(new File("C:\\Users\\Fabio Torres\\Compiler_PCL\\backend\\compilador-clp\\src\\main\\java\\iftm\\compilador\\clp\\storage\\communication.json"), Communication.class);
+            Communication newCommunication = objectMapper.readValue(new File("C:\\Users\\Fabio Torres\\Compiler_PCL\\backend\\src\\main\\java\\iftm\\compilador\\clp\\storage\\communication.json"), Communication.class);
 
             if(!Arrays.toString(communicationData.OUTPUT).equals(Arrays.toString(newCommunication.OUTPUT))){
                 System.out.println(Arrays.toString(communicationData.OUTPUT).equals(Arrays.toString(newCommunication.OUTPUT)));
                 System.out.println(Arrays.toString(newCommunication.OUTPUT));
                 System.out.println(Arrays.toString(communicationData.OUTPUT));
 
-                objectMapper.writeValue(new File("C:\\Users\\Fabio Torres\\Compiler_PCL\\backend\\compilador-clp\\src\\main\\java\\iftm\\compilador\\clp\\storage\\communication.json"), communicationData);
+                objectMapper.writeValue(new File("C:\\Users\\Fabio Torres\\Compiler_PCL\\backend\\src\\main\\java\\iftm\\compilador\\clp\\storage\\communication.json"), communicationData);
             }
 
             if(!Arrays.toString(communicationData.INPUT).equals(Arrays.toString(newCommunication.INPUT))){

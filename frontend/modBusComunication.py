@@ -27,8 +27,6 @@ class Modbus:
 
     def read_input_registers(self):
         self.input_reg = decimal_to_array(self.instrument.read_register(192))
-        print(self.input_reg)
-        print(self.instrument.read_register(192))
         return self.input_reg
 
     def write_output_registers(self, output_reg):

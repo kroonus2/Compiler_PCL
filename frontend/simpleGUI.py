@@ -5,11 +5,11 @@ from modbusConfigManager import ModbusConfigManager
 import serial.tools.list_ports
 import tempfile
 from subprocess import Popen, PIPE, STDOUT
+import time
+import threading
 
 # Add a touch of color
 sg.theme('Dark Grey 10')
-
-processoAntigo = ""
 
 # Create settings obj
 settings = sg.UserSettings()
@@ -17,9 +17,8 @@ output_reg = [0, 0, 0, 0, 0, 0, 0, 0]
 
 # Create global vars
 selected_port = ""
-timeAfter = 0
-
-execuntando = False
+scan_cycle_time = 1
+last_process = last_thread = is_initialize = False
 
 modbus = Modbus()
 
@@ -31,10 +30,32 @@ if configuracoes_salvas:
     output_reg = configuracoes_salvas.get('OUTPUT', output_reg)
 
 
-def listar_portas_seriais():
-    portas = list(serial.tools.list_ports.comports())
-    nomes_portas = [porta.device for porta in portas]
-    return nomes_portas
+def list_serial_ports():
+    serial_ports = list(serial.tools.list_ports.comports())
+    port_names = [port.device for port in serial_ports]
+    return port_names
+
+def create_file(source_code):
+    with tempfile.TemporaryFile(suffix='.pas', mode='w+', encoding='utf-8', delete=False) as code_file:
+        code_file.write(source_code)
+        code_file.seek(0)
+        return code_file.name
+
+def kill_process(process):
+    parent_process = psutil.Process(process.pid)
+    for child_process in parent_process.children(recursive=True):
+        child_process.terminate()
+    return True
+
+def scan_cycle():
+    modbus_instrument = modbus.get_instrument(selected_port)
+    modbus_instrument.read_input_registers()
+    
+    saved_output_settings = configuracoes_salvas.get('OUTPUT', output_reg)
+    modbus_instrument.write_output_registers(saved_output_settings)
+    
+    config_manager.atualizar_input_reg(modbus.input_reg)
+    time.sleep(scan_cycle_time)
 
 
 # All the stuff inside your window.
@@ -47,7 +68,7 @@ layout_l = [
 ]
 
 layout_r = [
-    [sg.Text('Porta Serial:'), sg.Combo(listar_portas_seriais(),
+    [sg.Text('Porta Serial:'), sg.Combo(list_serial_ports(),
                                         key='-CHOOSE_PORT-', enable_events=True)],
     [sg.Text('Entradas: ')],
     [sg.Listbox([f'I1  --  {modbus.input_reg[7]}',
@@ -60,14 +81,14 @@ layout_r = [
                  f'I8  --  {modbus.input_reg[0]}'],
                 no_scrollbar=True, enable_events=True, s=(25, 11), select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, key='-INPUT-')],
     [sg.Text('Saidas: ')],
-    [sg.Listbox([f'O1  --  {output_reg[7]}',
-                 f'O2  --  {output_reg[6]}',
-                 f'O3  --  {output_reg[5]}',
-                 f'O4  --  {output_reg[4]}',
-                 f'O5  --  {output_reg[3]}',
-                 f'O6  --  {output_reg[2]}',
-                 f'O7  --  {output_reg[1]}',
-                 f'O8  --  {output_reg[0]}'],
+    [sg.Listbox([f'Q1  --  {output_reg[7]}',
+                 f'Q2  --  {output_reg[6]}',
+                 f'Q3  --  {output_reg[5]}',
+                 f'Q4  --  {output_reg[4]}',
+                 f'Q5  --  {output_reg[3]}',
+                 f'Q6  --  {output_reg[2]}',
+                 f'Q7  --  {output_reg[1]}',
+                 f'Q8  --  {output_reg[0]}'],
                 no_scrollbar=True, enable_events=True, select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, s=(25, 11), key='-OUTPUT-')],
     [sg.Text('Tempo de varredura(ms): ')],
     [sg.Input(key='-TIMEREAD-', s=(12, 1)),
@@ -87,14 +108,6 @@ layout = [[sg.Menu(menu_def)],
 # Create the Window
 window = sg.Window('Compilador CLP', layout)
 code_list = []
-
-
-def criarArquivo(codigoTexto):
-    arquivoCodigo = tempfile.TemporaryFile(suffix='.pas')
-    arquivoCodigo.write(codigoTexto.encode('utf-8'))
-    arquivoCodigo.seek(0)
-    return arquivoCodigo.name
-
 
 while True:
     event, values = window.read()
@@ -155,9 +168,9 @@ while True:
 
     elif event == '-OKBTN-':
         try:
-            timeAfter = int(values['-TIMEREAD-'])
+            scan_cycle_time = int(values['-TIMEREAD-'])
         except ValueError:
-            timeAfter = 0
+            scan_cycle_time = 1
             sg.popup_error(
                 'Por favor, insira um valor válido para o tempo após a varredura.', title='Erro')
 
@@ -168,49 +181,29 @@ while True:
                 'Por favor, selecione uma porta válida antes de executar o código.', title='Erro na Porta')
             continue  # Volta ao início do loop, impedindo a execução do código
 
-        print("passou!")
-        execuntando = True
-        # if (execuntando):
-        #     window['Executar'].Update(disabled=True)
-        #     window['Parar'].Update(disabled=False)
+        is_initialize = True
+        if (is_initialize):
+            window['Executar'].Update(disabled=True)
+            window['Parar'].Update(disabled=False)
 
-     # if(window['-CHOOSE_PORT-'].get() == ""):
-        #     continue
 
-        # arquivoCodigo = tempfile.TemporaryFile(suffix='.pas', delete=False)
-        # arquivoCodigo.write(str(window['-CODE-'].get()+'\n').encode('utf-8'))
-        # arquivoCodigo.seek(0)
-        # arquivoCodigo.close()
+        source_code = str(window['-CODE-'].get()+'\n')
+        path_source_code = create_file(source_code)
 
-        # if(processoAntigo != ""):
-        #     for processo_filho in psutil.Process(processoAntigo.pid).children():
-        #         processo_filho.terminate()
-        #         processoAntigo = ""
+        if(last_process != False):
+            last_thread = False
+            last_process = False
+            kill_process(last_process)
 
-        # processoAntigo = Popen(["java", "-cp", "../backend/target/compilador-clp-1.0-SNAPSHOT-jar-with-dependencies.jar", "iftm.compilador.clp.App", arquivoCodigo.name], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+        last_process = Popen(["java", "-cp", "../backend/target/compilador-clp-1.0-SNAPSHOT-jar-with-dependencies.jar", "iftm.compilador.clp.App", path_source_code], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
 
-        # primeiroLido = False
-        # possivelErro = ""
-        # for line in processoAntigo.stdout:
-        #     if(not primeiroLido):
-        #         primeiroLido = True
-        #         print(line)
-        #     else:
-        #         possivelErro = line
-        #         break
+        last_thread = threading.Thread(target=scan_cycle)
+        last_thread.start()
 
-        # if(len(possivelErro) > 5):
-        #     sg.popup(possivelErro.decode('utf-8', errors='replace'), title='Ocorreu um erro ao compilar')
-        #     processoAntigo = ""
-        # modbus.get_instrument(selected_port)
-        # modbus.read_input_registers()
-        # modbus.write_output_registers(output_reg)
-
-        # Atualize o arquivo JSON com as informações atuais
-        config_manager.atualizar_input_reg(modbus.input_reg)
     elif event == "-STOP-":
         execuntando = False
         window['-RUN-'].Update(disabled=False)
         window['-STOP-'].Update(disabled=True)
 
 window.close()
+
