@@ -1,6 +1,7 @@
 import psutil
 import PySimpleGUI as sg
 from modBusComunication import Modbus
+from modbusConfigManager import ModbusConfigManager
 import serial.tools.list_ports
 import tempfile
 from subprocess import Popen, PIPE, STDOUT
@@ -12,10 +13,22 @@ processoAntigo = ""
 
 # Create settings obj
 settings = sg.UserSettings()
-output_reg = [1, 0, 1, 0, 1, 0, 1, 0]
-# Get the list of serial ports
+output_reg = [0, 0, 0, 0, 0, 0, 0, 0]
+
+# Create global vars
+selected_port = ""
+timeAfter = 0
+
+execuntando = False
 
 modbus = Modbus()
+
+
+config_manager = ModbusConfigManager()
+configuracoes_salvas = config_manager.carregar_configuracoes()
+
+if configuracoes_salvas:
+    output_reg = configuracoes_salvas.get('OUTPUT', output_reg)
 
 
 def listar_portas_seriais():
@@ -35,28 +48,28 @@ layout_r = [
     [sg.Text('Porta Serial:'), sg.Combo(listar_portas_seriais(),
                                         key='-CHOOSE_PORT-', enable_events=True)],
     [sg.Text('Entradas: ')],
-    [sg.Listbox([f'I:1/0  --  {modbus.input_reg[0]}',
-                 f'I:1/1  --  {modbus.input_reg[1]}',
-                 f'I:1/2  --  {modbus.input_reg[2]} ',
-                 f'I:1/3  --  {modbus.input_reg[3]}',
-                 f'I:1/4  --  {modbus.input_reg[4]}',
-                 f'I:1/5  --  {modbus.input_reg[5]}',
-                 f'I:1/6  --  {modbus.input_reg[6]}',
-                 f'I:1/7  --  {modbus.input_reg[7]}'],
+    [sg.Listbox([f'I1  --  {modbus.input_reg[7]}',
+                 f'I2  --  {modbus.input_reg[6]}',
+                 f'I3  --  {modbus.input_reg[5]} ',
+                 f'I4  --  {modbus.input_reg[4]}',
+                 f'I5  --  {modbus.input_reg[3]}',
+                 f'I6  --  {modbus.input_reg[2]}',
+                 f'I7  --  {modbus.input_reg[1]}',
+                 f'I8  --  {modbus.input_reg[0]}'],
                 no_scrollbar=True, enable_events=True, s=(25, 11), select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, key='-INPUT-')],
     [sg.Text('Saidas: ')],
-    [sg.Listbox([f'O:2/0  --  {output_reg[0]}',
-                 f'O:2/1  --  {output_reg[1]}',
-                 f'O:2/2  --  {output_reg[2]}',
-                 f'O:2/3  --  {output_reg[3]}',
-                 f'O:2/4  --  {output_reg[4]}',
-                 f'O:2/5  --  {output_reg[5]}',
-                 f'O:2/6  --  {output_reg[6]}',
-                 f'O:2/7  --  {output_reg[7]}'],
+    [sg.Listbox([f'O1  --  {output_reg[7]}',
+                 f'O2  --  {output_reg[6]}',
+                 f'O3  --  {output_reg[5]}',
+                 f'O4  --  {output_reg[4]}',
+                 f'O5  --  {output_reg[3]}',
+                 f'O6  --  {output_reg[2]}',
+                 f'O7  --  {output_reg[1]}',
+                 f'O8  --  {output_reg[0]}'],
                 no_scrollbar=True, enable_events=True, select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, s=(25, 11), key='-OUTPUT-')],
     [sg.Text('Tempo de varredura(ms): ')],
     [sg.Input(key='-TIMEREAD-', s=(12, 1)),
-     sg.Button("Add", enable_events=True, key="-ADDBTN-")],
+     sg.Button("Ok", enable_events=True, key="-OKBTN-")],
 ]
 
 menu_def = [['File', ['Abrir', 'Salvar',]],
@@ -78,7 +91,7 @@ def criarArquivo(codigoTexto):
     arquivoCodigo = tempfile.TemporaryFile(suffix='.pas')
     arquivoCodigo.write(codigoTexto.encode('utf-8'))
     arquivoCodigo.seek(0)
-    return arquivoCodigo.name;
+    return arquivoCodigo.name
 
 
 while True:
@@ -88,30 +101,32 @@ while True:
 
     elif event == '-CHOOSE_PORT-':
         selected_port = values['-CHOOSE_PORT-']
-        modbus.get_instrument(selected_port)
-        modbus.read_input_registers()
-        window['-INPUT-'].Update(
-            [f'I:1/0  --  {modbus.input_reg[0]}',
-             f'I:1/1  --  {modbus.input_reg[1]}',
-             f'I:1/2  --  {modbus.input_reg[2]}',
-             f'I:1/3  --  {modbus.input_reg[3]}',
-             f'I:1/4  --  {modbus.input_reg[4]}',
-             f'I:1/5  --  {modbus.input_reg[5]}',
-             f'I:1/6  --  {modbus.input_reg[6]}',
-             f'I:1/7  --  {modbus.input_reg[7]}']
-        )
-        if selected_port:
+        if selected_port.upper() == 'COM1':
+            sg.popup_error(
+                'A porta COM1 não é válida. Por favor, escolha outra porta.', title='Erro')
+        else:
+            window['-INPUT-'].Update(
+                [f'I1  --  {modbus.input_reg[7]}',
+                 f'I2  --  {modbus.input_reg[6]}',
+                 f'I3  --  {modbus.input_reg[5]}',
+                 f'I4  --  {modbus.input_reg[4]}',
+                 f'I5  --  {modbus.input_reg[3]}',
+                 f'I6  --  {modbus.input_reg[2]}',
+                 f'I7  --  {modbus.input_reg[1]}',
+                 f'I8  --  {modbus.input_reg[0]}']
+            )
+        if selected_port and selected_port.upper() != 'COM1':
             sg.popup(
                 f'Porta Selecionada: {selected_port}', title='Porta Selecionada')
 
     elif event == 'Ajuda':
-        file = open("Help.txt")
+        file = open("frontend/Help.txt")
         Helper = file.read()
         sg.popup_scrolled(Helper, title="Helper", font=(
             "Arial", 12), size=(55, 20))
 
     elif event == "Sobre":
-        file = open("About.txt")
+        file = open("frontend/About.txt")
         About = file.read()
         sg.popup_scrolled(About, title="About", font=(
             "Arial", 12), size=(55, 20))
@@ -136,41 +151,27 @@ while True:
             sg.popup_error(
                 'Nenhum código para salvar. Digite seu código antes de salvar.', title='Erro')
 
-    elif event == '-ADDBTN-':
-        selected_item = None
-        if values['-INPUT-']:
-            selected_item = values['-INPUT-'][0]
-        elif values['-OUTPUT-']:
-            selected_item = values['-OUTPUT-'][0]
-
-        if selected_item:
-            code_list.append(selected_item)
-            current_text = window['-CODE-'].get()
-            if current_text:
-                current_text += '    '  # Add 2 tabs of space if the field is not empty
-            current_text += selected_item
-            window['-CODE-'].update(current_text)
-
-        window['-INPUT-'].update(set_to_index=-1)
-        window['-OUTPUT-'].update(set_to_index=-1)
-
-    elif event == '-REMOVEBTN-':
-        if code_list:
-            last_item = code_list.pop()
-            current_text = window['-CODE-'].get()
-            if current_text.endswith(last_item):
-                # Remove the last item and 2 tabs of space
-                current_text = current_text[:-(len(last_item) + 4)]
-                window['-CODE-'].update(current_text)
-    elif event == 'Limpar':
-        current_text = window['-CODE-'].get()
-        if current_text:
-            window['-CODE-'].update('')
+    elif event == '-OKBTN-':
+        try:
+            timeAfter = int(values['-TIMEREAD-'])
+        except ValueError:
+            timeAfter = 0
+            sg.popup_error(
+                'Por favor, insira um valor válido para o tempo após a varredura.', title='Erro')
 
     elif event == 'Executar':
-        # if(window['-CHOOSE_PORT-'].get() == ""):
+
+        if not selected_port or selected_port.upper() == 'COM1':
+            sg.popup_error(
+                'Por favor, selecione uma porta válida antes de executar o código.', title='Erro na Porta')
+            continue  # Volta ao início do loop, impedindo a execução do código
+
+        print("passou!")
+        execuntando = True
+
+     # if(window['-CHOOSE_PORT-'].get() == ""):
         #     continue
-        
+
         # arquivoCodigo = tempfile.TemporaryFile(suffix='.pas', delete=False)
         # arquivoCodigo.write(str(window['-CODE-'].get()+'\n').encode('utf-8'))
         # arquivoCodigo.seek(0)
@@ -180,10 +181,9 @@ while True:
         #     for processo_filho in psutil.Process(processoAntigo.pid).children():
         #         processo_filho.terminate()
         #         processoAntigo = ""
-            
-        
+
         # processoAntigo = Popen(["java", "-cp", "../backend/target/compilador-clp-1.0-SNAPSHOT-jar-with-dependencies.jar", "iftm.compilador.clp.App", arquivoCodigo.name], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
-        
+
         # primeiroLido = False
         # possivelErro = ""
         # for line in processoAntigo.stdout:
@@ -193,11 +193,14 @@ while True:
         #     else:
         #         possivelErro = line
         #         break
-            
+
         # if(len(possivelErro) > 5):
         #     sg.popup(possivelErro.decode('utf-8', errors='replace'), title='Ocorreu um erro ao compilar')
         #     processoAntigo = ""
+        modbus.get_instrument(selected_port)
+        modbus.read_input_registers()
+        # modbus.write_output_registers(output_reg)
 
-        modbus.write_output_registers(output_reg)
-
+        # Atualize o arquivo JSON com as informações atuais
+        config_manager.atualizar_input_reg(modbus.input_reg)
 window.close()
