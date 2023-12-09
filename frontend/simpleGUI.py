@@ -35,11 +35,13 @@ def list_serial_ports():
     port_names = [port.device for port in serial_ports]
     return port_names
 
+
 def create_file(source_code):
     with tempfile.TemporaryFile(suffix='.pas', mode='w+', encoding='utf-8', delete=False) as code_file:
         code_file.write(source_code)
         code_file.seek(0)
         return code_file.name
+
 
 def kill_process(process):
     parent_process = psutil.Process(process.pid)
@@ -47,15 +49,44 @@ def kill_process(process):
         child_process.terminate()
     return True
 
+
 def scan_cycle():
-    modbus_instrument = modbus.get_instrument(selected_port)
-    modbus_instrument.read_input_registers()
-    
-    saved_output_settings = configuracoes_salvas.get('OUTPUT', output_reg)
-    modbus_instrument.write_output_registers(saved_output_settings)
-    
-    config_manager.atualizar_input_reg(modbus.input_reg)
-    time.sleep(scan_cycle_time)
+    while True:
+        print("Entrou no Ciclo")
+        modbus.get_instrument(selected_port)
+        modbus.read_input_registers()
+        print("Leu as entradas")
+        configuracoes_salvas = config_manager.carregar_configuracoes()  # aq
+        output_reg = configuracoes_salvas.get('OUTPUT')
+        modbus.write_output_registers(output_reg)
+        print(f"Escreveu nas saidas --> {output_reg}")
+        config_manager.atualizar_input_reg(modbus.input_reg)
+        update_IN_OUT(configuracoes_salvas)
+        print("Atualizou a tela")
+        time.sleep(scan_cycle_time)
+
+
+def update_IN_OUT(configuracoes_salvas):
+    window['-INPUT-'].Update(
+        [f'I1  --  {modbus.input_reg[7]}',
+         f'I2  --  {modbus.input_reg[6]}',
+         f'I3  --  {modbus.input_reg[5]}',
+         f'I4  --  {modbus.input_reg[4]}',
+         f'I5  --  {modbus.input_reg[3]}',
+         f'I6  --  {modbus.input_reg[2]}',
+         f'I7  --  {modbus.input_reg[1]}',
+         f'I8  --  {modbus.input_reg[0]}']
+    )
+    window['-OUTPUT-'].Update(
+        [f'Q1  --  {configuracoes_salvas.get("OUTPUT")[7]}',
+         f'Q2  --  {configuracoes_salvas.get("OUTPUT")[6]}',
+         f'Q3  --  {configuracoes_salvas.get("OUTPUT")[5]}',
+         f'Q4  --  {configuracoes_salvas.get("OUTPUT")[4]}',
+         f'Q5  --  {configuracoes_salvas.get("OUTPUT")[3]}',
+         f'Q6  --  {configuracoes_salvas.get("OUTPUT")[2]}',
+         f'Q7  --  {configuracoes_salvas.get("OUTPUT")[1]}',
+         f'Q8  --  {configuracoes_salvas.get("OUTPUT")[0]}']
+    )
 
 
 # All the stuff inside your window.
@@ -63,7 +94,7 @@ layout_l = [
     [sg.Text('Lista de Instruções: ')],
     [sg.Multiline(size=(50, 33), key='-CODE-')],
     [sg.Button('Executar', disabled=False, key='-RUN-'), sg.Button(
-        'Parar', disabled=True, key='-STOP-', button_color=('white', '#800000')), sg.Button('Limpar')]
+        'Parar', disabled=True, key='-STOP-', button_color=('white', '#800000')), sg.Button('Limpar', key='-CLEAR-')]
     # Botão "Parar" desabilitado inicialmente
 ]
 
@@ -90,7 +121,7 @@ layout_r = [
                  f'Q7  --  {output_reg[1]}',
                  f'Q8  --  {output_reg[0]}'],
                 no_scrollbar=True, enable_events=True, select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, s=(25, 11), key='-OUTPUT-')],
-    [sg.Text('Tempo de varredura(ms): ')],
+    [sg.Text('Tempo APÓS varredura(s): ')],
     [sg.Input(key='-TIMEREAD-', s=(12, 1)),
      sg.Button("Ok", enable_events=True, key="-OKBTN-")],
 ]
@@ -175,35 +206,41 @@ while True:
                 'Por favor, insira um valor válido para o tempo após a varredura.', title='Erro')
 
     elif event == '-RUN-':
-
         if not selected_port or selected_port.upper() == 'COM1':
             sg.popup_error(
                 'Por favor, selecione uma porta válida antes de executar o código.', title='Erro na Porta')
             continue  # Volta ao início do loop, impedindo a execução do código
+        code = values['-CODE-']
+        if not code.strip():  # Check if the code is not empty or contains only whitespace
+            sg.popup_error(
+                'Não há código a ser executado.', title='Erro na Sintaxe')
+            continue  # Volta ao início do loop, impedindo a execução do código
 
         is_initialize = True
         if (is_initialize):
-            window['Executar'].Update(disabled=True)
-            window['Parar'].Update(disabled=False)
-
+            window['-RUN-'].Update(disabled=True)
+            window['-STOP-'].Update(disabled=False)
 
         source_code = str(window['-CODE-'].get()+'\n')
         path_source_code = create_file(source_code)
 
-        if(last_process != False):
+        if (last_process != False):
             last_thread = False
             last_process = False
             kill_process(last_process)
 
-        last_process = Popen(["java", "-cp", "../backend/target/compilador-clp-1.0-SNAPSHOT-jar-with-dependencies.jar", "iftm.compilador.clp.App", path_source_code], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+        last_process = Popen(["java", "-cp", "../backend/target/compilador-clp-1.0-SNAPSHOT-jar-with-dependencies.jar",
+                             "iftm.compilador.clp.App", path_source_code], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
 
         last_thread = threading.Thread(target=scan_cycle)
         last_thread.start()
 
     elif event == "-STOP-":
-        execuntando = False
+        is_initialize = False
         window['-RUN-'].Update(disabled=False)
         window['-STOP-'].Update(disabled=True)
 
-window.close()
+    elif event == "-CLEAR-":
+        window['-CODE-'].Update("")
 
+window.close()
