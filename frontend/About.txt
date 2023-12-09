@@ -1,5 +1,7 @@
-Este e um relatorio sobre um trabalho de controladores logicos, onde a proposta e que seja feito um compilador de CLP usando lista de instrucoes. Um compilador de CLP e um programa que converte um codigo-fonte em um codigo executavel para um controlador logico programavel, que e um dispositivo usado para controlar processos industriais. A lista de instrucoes e uma linguagem de programacao de baixo nivel que usa simbolos mnemonicos para representar operacoes logicas, aritmeticas e de transferencia de dados. O objetivo deste trabalho e desenvolver um compilador de CLP usando lista de instrucoes que seja capaz de gerar um codigo executavel para diferentes modelos de controladores logicos. A lista de membros participantes do projeto e a seguinte:
+Este e um trabalho de controladores logicos (CLP), onde a proposta e que seja feito um compilador de CLP usando lista de instrucoes. Um compilador de CLP e um programa que converte um codigo-fonte em um codigo executavel para um controlador logico programavel, que e um dispositivo usado para controlar processos industriais. A lista de instrucoes e uma linguagem de programacao de baixo nivel que usa simbolos mnemonicos para representar operacoes logicas, aritmeticas e de transferencia de dados. O objetivo deste trabalho e desenvolver um compilador de CLP usando lista de instrucoes que seja capaz de gerar um codigo executavel para diferentes modelos de controladores logicos. A lista de membros participantes do projeto e a seguinte:
 
-Fulano da Silva, responsavel pela analise lexica e sintatica do codigo-fonte.
-Ciclano de Souza, responsavel pela geracao do codigo intermediario e pela otimizacao do codigo.
-Beltrano dos Santos, responsavel pela geracao do codigo executavel e pela interface grafica do usuario.
+Bruno Henrique
+Fabio Torres
+Rafael Caroni
+Matheus Fischer
+Tiago Yoiti
