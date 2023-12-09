@@ -41,7 +41,9 @@ def listar_portas_seriais():
 layout_l = [
     [sg.Text('Lista de Instruções: ')],
     [sg.Multiline(size=(50, 33), key='-CODE-')],
-    [sg.Button('Executar'), sg.Button('Limpar')]
+    [sg.Button('Executar'), sg.Button(
+        'Parar', disabled=True, button_color=('white', '#800000')), sg.Button('Limpar')]
+    # Botão "Parar" desabilitado inicialmente
 ]
 
 layout_r = [
@@ -168,6 +170,9 @@ while True:
 
         print("passou!")
         execuntando = True
+        # if (execuntando):
+        #     window['Executar'].Update(disabled=True)
+        #     window['Parar'].Update(disabled=False)
 
      # if(window['-CHOOSE_PORT-'].get() == ""):
         #     continue
