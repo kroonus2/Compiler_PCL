@@ -25,7 +25,7 @@ public class Sintatico {
         while(token.getClasse() != Classe.cEOF){            
             if(token.getClasse() == Classe.cId){  
                 if(token.getValor().getTexto().length() > 16){
-                    erro("O comprimento do rótulo não deve exceder 16 caracteres.");
+                    erro("O comprimento do rotulo não deve exceder 16 caracteres.");
                 }              
                 token = lexico.nextToken();
                 consumirToken(Classe.cDoisPontos);
@@ -39,7 +39,7 @@ public class Sintatico {
             }else if(token.getClasse() == Classe.cParDir){
                 token = lexico.nextToken();                
             }else{
-                erro("Expressão inválida.");
+                erro("Expressao invalida.");
             }
         }                                              
     }
@@ -83,7 +83,7 @@ public class Sintatico {
                 operando();                    
             }
         }else{            
-            erro("Expressão inválida.");
+            erro("Expressao invalida.");
         }
     }
 

@@ -81,15 +81,8 @@ public class Semantico {
             } 
             //verifica a quantidade de parênteses do programa
             if(cParEsq_counter != 0 || cParDir_counter !=0){
-                error("Expressão inválida: abertura ou fechamento de parêntese esperado.");
+                error("Expressao invalida: abertura ou fechamento de parentese esperado.");
             }
-            
-            System.out.println("Acumulador: "+accumulator +" - Entrada Q1: "+ jsonReader.communicationData.INPUT[1]);
-            System.out.println("Acumulador: "+accumulator +" - Entrada Q2: "+ jsonReader.communicationData.INPUT[2]);
-            System.out.println("Acumulador: "+accumulator +" - Saída Q1: "+ jsonReader.communicationData.OUTPUT[1]);
-            System.out.println("Acumulador: "+accumulator +" - Saída T1: "+ timers[1]);
-            System.out.println("Acumulador: "+accumulator +" - PRESET T1: "+ timers_preset[1]);
-            System.out.println("Acumulador: "+accumulator +" - OUTPUT T1: "+ timers_output[1]);
             
             Thread.sleep(1000);
         }
@@ -167,7 +160,7 @@ public class Semantico {
                     cParEsq_counter++;
 
                     if(!Palavras.hasModifier(Tokens.get(i-1).getValor().getTexto(), "(")){
-                        error("Instrução não permite o modificador '('.");
+                        error("Instrucao nao permite o modificador '('.");
                     }
 
                     stack.add(Tokens.get(i-1));
@@ -327,7 +320,7 @@ public class Semantico {
                     return;
                 }
             }            
-            error("Label não encontrado.");
+            error("Label nao encontrado.");
         }                
     }
 
@@ -345,7 +338,7 @@ public class Semantico {
                     return;
                 }
             }            
-            error("Label não encontrado.");
+            error("Label nao encontrado.");
         }                
     }
 
@@ -362,7 +355,7 @@ public class Semantico {
                 }
             }
         }else
-            error("Não há ponto de retorno.");
+            error("Não ha ponto de retorno.");
     }
 
     private void ctu(){
@@ -373,7 +366,7 @@ public class Semantico {
                 accumulator = register[port];
             }
         }else{
-            error("Expressão inválida.");
+            error("Expressao invalida.");
         } 
     }
 
@@ -391,7 +384,7 @@ public class Semantico {
                 timers_output[port] = 0;
             }
         }else{
-            error("Expressão inválida.");
+            error("Expressao invalida.");
         } 
     }
 
@@ -411,7 +404,7 @@ public class Semantico {
                 timers_output[port] = 0;
             }
         }else{
-            error("Expressão inválida.");
+            error("Expressao invalida.");
         } 
     }
 
@@ -421,7 +414,7 @@ public class Semantico {
         if (register != null && type == TYPE_COUNTER) {
             register[port] = 0;            
         }else{
-            error("Expressão inválida.");
+            error("Expressao invalida.");
         }
     }
 
@@ -468,7 +461,7 @@ public class Semantico {
                 try{
                     accumulator = accumulator / operated;
                 }catch(ArithmeticException e){
-                    error("Divisão por zero.");
+                    error("Divisao por zero.");
                 }
                 break;
             default:
@@ -523,7 +516,7 @@ public class Semantico {
                     }else if(id.charAt(0) == 'T'){
                         type = TYPE_TIMER;
                     }else{                                    
-                        error("Operando inválido.");
+                        error("Operando invalido.");
                     }
                 }else{
                     //forma a parte numérica do identificador
@@ -540,11 +533,11 @@ public class Semantico {
                 }
 
                 if (port > maxLength) {
-                    error("Porta '" + num + "' inválida.");
+                    error("Porta '" + num + "' invalida.");
                 }                     
             }catch (NumberFormatException e) {
                 System.out.println(e);
-                error("Porta '" + num + "' inválida.");
+                error("Porta '" + num + "' invalida.");
             }
         }                            
     }
@@ -557,7 +550,7 @@ public class Semantico {
                     labels.add(j);
                 }else{
                     token = Tokens.get(j);
-                    error("Rótulo duplicado.");
+                    error("Rotulo duplicado.");
                 }
             }
             j++;
