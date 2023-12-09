@@ -1,9 +1,14 @@
+import psutil
 import PySimpleGUI as sg
 from modBusComunication import Modbus
 import serial.tools.list_ports
+import tempfile
+from subprocess import Popen, PIPE, STDOUT
 
 # Add a touch of color
 sg.theme('Dark Grey 10')
+
+processoAntigo = ""
 
 # Create settings obj
 settings = sg.UserSettings()
@@ -67,6 +72,14 @@ layout = [[sg.Menu(menu_def)],
 # Create the Window
 window = sg.Window('Compilador CLP', layout)
 code_list = []
+
+
+def criarArquivo(codigoTexto):
+    arquivoCodigo = tempfile.TemporaryFile(suffix='.pas')
+    arquivoCodigo.write(codigoTexto.encode('utf-8'))
+    arquivoCodigo.seek(0)
+    return arquivoCodigo.name;
+
 
 while True:
     event, values = window.read()
@@ -155,7 +168,36 @@ while True:
             window['-CODE-'].update('')
 
     elif event == 'Executar':
-        print('Executando...')
+        # if(window['-CHOOSE_PORT-'].get() == ""):
+        #     continue
+        
+        # arquivoCodigo = tempfile.TemporaryFile(suffix='.pas', delete=False)
+        # arquivoCodigo.write(str(window['-CODE-'].get()+'\n').encode('utf-8'))
+        # arquivoCodigo.seek(0)
+        # arquivoCodigo.close()
+
+        # if(processoAntigo != ""):
+        #     for processo_filho in psutil.Process(processoAntigo.pid).children():
+        #         processo_filho.terminate()
+        #         processoAntigo = ""
+            
+        
+        # processoAntigo = Popen(["java", "-cp", "../backend/target/compilador-clp-1.0-SNAPSHOT-jar-with-dependencies.jar", "iftm.compilador.clp.App", arquivoCodigo.name], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+        
+        # primeiroLido = False
+        # possivelErro = ""
+        # for line in processoAntigo.stdout:
+        #     if(not primeiroLido):
+        #         primeiroLido = True
+        #         print(line)
+        #     else:
+        #         possivelErro = line
+        #         break
+            
+        # if(len(possivelErro) > 5):
+        #     sg.popup(possivelErro.decode('utf-8', errors='replace'), title='Ocorreu um erro ao compilar')
+        #     processoAntigo = ""
+
         modbus.write_output_registers(output_reg)
 
 window.close()
