@@ -41,8 +41,8 @@ def listar_portas_seriais():
 layout_l = [
     [sg.Text('Lista de Instruções: ')],
     [sg.Multiline(size=(50, 33), key='-CODE-')],
-    [sg.Button('Executar'), sg.Button(
-        'Parar', disabled=True, button_color=('white', '#800000')), sg.Button('Limpar')]
+    [sg.Button('Executar', disabled=False, key='-RUN-'), sg.Button(
+        'Parar', disabled=True, key='-STOP-', button_color=('white', '#800000')), sg.Button('Limpar')]
     # Botão "Parar" desabilitado inicialmente
 ]
 
@@ -161,7 +161,7 @@ while True:
             sg.popup_error(
                 'Por favor, insira um valor válido para o tempo após a varredura.', title='Erro')
 
-    elif event == 'Executar':
+    elif event == '-RUN-':
 
         if not selected_port or selected_port.upper() == 'COM1':
             sg.popup_error(
@@ -202,10 +202,15 @@ while True:
         # if(len(possivelErro) > 5):
         #     sg.popup(possivelErro.decode('utf-8', errors='replace'), title='Ocorreu um erro ao compilar')
         #     processoAntigo = ""
-        modbus.get_instrument(selected_port)
-        modbus.read_input_registers()
+        # modbus.get_instrument(selected_port)
+        # modbus.read_input_registers()
         # modbus.write_output_registers(output_reg)
 
         # Atualize o arquivo JSON com as informações atuais
         config_manager.atualizar_input_reg(modbus.input_reg)
+    elif event == "-STOP-":
+        execuntando = False
+        window['-RUN-'].Update(disabled=False)
+        window['-STOP-'].Update(disabled=True)
+
 window.close()
