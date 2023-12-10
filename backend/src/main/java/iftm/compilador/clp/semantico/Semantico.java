@@ -527,7 +527,7 @@ public class Semantico {
                 }
             }
             try {
-                port = Integer.parseInt(num.replaceAll("[^0-9]", ""));
+                port = Integer.parseInt(num.replaceAll("[^0-9]", "")) - 1;
                 int maxLength = 0;
                 if (type == TYPE_INPUT || type == TYPE_OUTPUT || type == TYPE_COUNTER) {
                     maxLength = jsonReader.communicationData.INPUT.length - 1;
@@ -535,7 +535,7 @@ public class Semantico {
                     maxLength = memory_reg.length - 1;
                 }
 
-                if (port > maxLength) {
+                if (port == -1 || port > maxLength) {
                     error("Porta '" + num + "' invalida.");
                 }
             } catch (NumberFormatException e) {
