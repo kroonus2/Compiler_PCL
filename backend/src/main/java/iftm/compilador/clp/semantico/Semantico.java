@@ -87,15 +87,8 @@ public class Semantico {
             if (cParEsq_counter != 0 || cParDir_counter != 0) {
                 error("Expressao invalida: abertura ou fechamento de parentese esperado.");
             }
-            System.out.println("Acumulador: "+accumulator +" - INPUT I1: "+ jsonReader.communicationData.INPUT[0]);
-            System.out.println("Acumulador: "+accumulator +" - INPUT I2: "+ jsonReader.communicationData.INPUT[1]);
-            System.out.println("Acumulador: "+accumulator +" - INPUT I3: "+ jsonReader.communicationData.INPUT[2]);
-            System.out.println("Acumulador: "+accumulator +" - INPUT I4: "+ jsonReader.communicationData.INPUT[3]);
-            System.out.println("Acumulador: "+accumulator +" - INPUT I5: "+ jsonReader.communicationData.INPUT[4]);
-            System.out.println("Acumulador: "+accumulator +" - INPUT I6: "+ jsonReader.communicationData.INPUT[5]);
-            System.out.println("Acumulador: "+accumulator +" - INPUT I7: "+ jsonReader.communicationData.INPUT[6]);
-            System.out.println("Acumulador: "+accumulator +" - INPUT I8: "+ jsonReader.communicationData.INPUT[7]);
-            Thread.sleep(1000);
+
+            Thread.sleep(1);
         }
     }
 
@@ -149,7 +142,7 @@ public class Semantico {
                             if (token.getClasse() == Classe.cInt) {
                                 int timer_preset_index = Integer
                                         .parseInt(tokenCId.getValor().getTexto().replaceAll("\\D", ""));
-                                timers_preset[timer_preset_index] = token.getValor().getInteiro();
+                                timers_preset[timer_preset_index-1] = token.getValor().getInteiro();
                             }
                         }
                     }

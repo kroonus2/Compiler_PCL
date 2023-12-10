@@ -1,4 +1,7 @@
 LD      I1
-TON    T1, 15
+AND(     
+LD      I2
+)
+TON    T1, 200
 LD      T1Q
 ST      Q1
