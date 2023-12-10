@@ -230,7 +230,7 @@ while True:
             kill_process(last_process)
 
         last_process = Popen(["java", "-cp", "../backend/target/compilador-clp-1.0-SNAPSHOT-jar-with-dependencies.jar",
-                             "iftm.compilador.clp.App", path_source_code], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+                             "iftm.compilador.clp.App", path_source_code])
 
         last_thread = threading.Thread(target=scan_cycle)
         last_thread.start()
