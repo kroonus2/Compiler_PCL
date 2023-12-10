@@ -38,7 +38,7 @@ public class JSONReaderThread extends Thread {
                 communicationData.INPUT = newCommunication.INPUT;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            ;
         }
     }
 }
