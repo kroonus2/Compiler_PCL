@@ -142,7 +142,7 @@ public class Semantico {
                             if (token.getClasse() == Classe.cInt) {
                                 int timer_preset_index = Integer
                                         .parseInt(tokenCId.getValor().getTexto().replaceAll("\\D", ""));
-                                timers_preset[timer_preset_index-1] = token.getValor().getInteiro();
+                                timers_preset[timer_preset_index-1] = token.getValor().getInteiro()/2;
                             }
                         }
                     }
