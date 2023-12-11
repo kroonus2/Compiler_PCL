@@ -11,6 +11,7 @@ public class JSONReaderThread extends Thread {
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     public Communication communicationData = new Communication();
+    public String pathFile = System.getProperty("user.dir") + "\\storage\\communication.json";
 
     public JSONReaderThread() {
         this.setDaemon(true);
@@ -24,19 +25,17 @@ public class JSONReaderThread extends Thread {
     private void readJSON() {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            Communication newCommunication = objectMapper.readValue(new File("C:\\Users\\Rafael\\Desktop\\CLP\\TrabalhoFinalCLP\\backend\\src\\main\\java\\iftm\\compilador\\clp\\storage\\communication.json"), Communication.class);
+            File fileOpened = new File(pathFile);
+            Communication communicationReaded = objectMapper.readValue(fileOpened, Communication.class);
 
-            if(!Arrays.toString(communicationData.OUTPUT).equals(Arrays.toString(newCommunication.OUTPUT))){
-                System.out.println(Arrays.toString(communicationData.OUTPUT).equals(Arrays.toString(newCommunication.OUTPUT)));
-                System.out.println(Arrays.toString(newCommunication.OUTPUT));
-                System.out.println(Arrays.toString(communicationData.OUTPUT));
-
-                objectMapper.writeValue(new File("C:\\Users\\Rafael\\Desktop\\CLP\\TrabalhoFinalCLP\\backend\\src\\main\\java\\iftm\\compilador\\clp\\storage\\communication.json"), communicationData);
+            if(!Arrays.toString(communicationData.OUTPUT).equals(Arrays.toString(communicationReaded.OUTPUT))){
+                objectMapper.writeValue(fileOpened, communicationData);
             }
 
-            if(!Arrays.toString(communicationData.INPUT).equals(Arrays.toString(newCommunication.INPUT))){
-                communicationData.INPUT = newCommunication.INPUT;
+            if(!Arrays.toString(communicationData.INPUT).equals(Arrays.toString(communicationReaded.INPUT))){
+                communicationData.INPUT = communicationReaded.INPUT;
             }
+
         } catch (Exception e) {
             ;
         }
