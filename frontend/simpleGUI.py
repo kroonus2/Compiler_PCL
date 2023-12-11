@@ -51,7 +51,7 @@ def kill_process(process):
 
 
 def scan_cycle():
-    while True:
+    while last_thread:
         print("Entrou no Ciclo")
         modbus.get_instrument(selected_port)
         modbus.read_input_registers()
@@ -220,14 +220,10 @@ while True:
         if (is_initialize):
             window['-RUN-'].Update(disabled=True)
             window['-STOP-'].Update(disabled=False)
+            window['-CODE-'].Update(disabled=True)
 
         source_code = str(window['-CODE-'].get()+'\n')
         path_source_code = create_file(source_code)
-
-        if (last_process != False):
-            last_thread = False
-            last_process = False
-            kill_process(last_process)
 
         last_process = Popen(["java", "-cp", "../backend/target/compilador-clp-1.0-SNAPSHOT-jar-with-dependencies.jar",
                              "iftm.compilador.clp.App", path_source_code])
@@ -237,8 +233,16 @@ while True:
 
     elif event == "-STOP-":
         is_initialize = False
+        last_thread = False
+        window['-CODE-'].Update(disabled=False)
+        kill_process(last_process)
+        last_process = False
+        
         window['-RUN-'].Update(disabled=False)
         window['-STOP-'].Update(disabled=True)
+
+        sg.popup_ok(
+                'O programa foi parado com sucesso.', title='Parado com sucesso')
 
     elif event == "-CLEAR-":
         window['-CODE-'].Update("")
