@@ -79,18 +79,18 @@ def kill_process(process):
 
 def scan_cycle():
     while last_thread:
-        print("Entrou no Ciclo")
+        # print("Entrou no Ciclo")
         modbus.get_instrument(selected_port)
         modbus.read_input_registers()
-        print("Leu as entradas")
+        # print("Leu as entradas")
         configuracoes_salvas = config_manager.carregar_configuracoes()  # aq
         print(configuracoes_salvas)
         output_reg = configuracoes_salvas.get('OUTPUT')
         modbus.write_output_registers(output_reg)
-        print(f"Escreveu nas saidas --> {output_reg}")
+        # print(f"Escreveu nas saidas --> {output_reg}")
         config_manager.atualizar_input_reg(modbus.input_reg)
         update_IN_OUT(configuracoes_salvas)
-        print("Atualizou a tela")
+        # print("Atualizou a tela")
         time.sleep(scan_cycle_time)
 
 
