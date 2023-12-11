@@ -46,7 +46,6 @@ public class App {
 
 		String caminhoArquivo = Paths.get(nomeArquivo).toAbsolutePath().toString();
 
-        System.out.println(caminhoArquivo);
         Lexico lexico;
         
 		try (BufferedReader br = new BufferedReader(new FileReader(caminhoArquivo))) {
