@@ -3,7 +3,7 @@ import json
 
 class ModbusConfigManager:
     def __init__(self):
-        self.config_file = 'backend/src/main/java/iftm/compilador/clp/storage/communication.json'
+        self.config_file = 'backend/target/storage/communication.json'
 
     def carregar_configuracoes(self):
         try:
