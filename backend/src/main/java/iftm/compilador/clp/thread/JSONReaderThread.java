@@ -37,7 +37,7 @@ public class JSONReaderThread extends Thread {
             }
 
         } catch (Exception e) {
-            ;
+            e.printStackTrace();
         }
     }
 }
