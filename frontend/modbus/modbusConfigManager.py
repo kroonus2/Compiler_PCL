@@ -3,7 +3,7 @@ import json
 
 class ModbusConfigManager:
     def __init__(self):
-        self.config_file = 'backend/target/storage/communication.json'
+        self.config_file = '../backend/target/storage/communication.json'
 
     def carregar_configuracoes(self):
         try:
@@ -15,6 +15,7 @@ class ModbusConfigManager:
 
     def salvar_configuracoes(self, configuracoes):
         with open(self.config_file, 'w') as arquivo_config:
+            configuracoes['INPUT'] = configuracoes['INPUT'][::-1]
             json.dump(configuracoes, arquivo_config, indent=4)
 
     def atualizar_input_reg(self, novo_input_reg):

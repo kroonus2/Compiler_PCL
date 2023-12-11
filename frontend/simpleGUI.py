@@ -1,7 +1,7 @@
 import psutil
 import PySimpleGUI as sg
-from modBusComunication import Modbus
-from modbusConfigManager import ModbusConfigManager
+from modbus.modBusComunication import Modbus
+from modbus.modbusConfigManager import ModbusConfigManager
 import serial.tools.list_ports
 import tempfile
 from subprocess import Popen, PIPE, STDOUT
@@ -26,7 +26,7 @@ config_manager = ModbusConfigManager()
 configuracoes_salvas = config_manager.carregar_configuracoes()
 
 if configuracoes_salvas:
-    output_reg = configuracoes_salvas.get('OUTPUT', output_reg) 
+    output_reg = configuracoes_salvas.get('OUTPUT', output_reg)
 
 
 def stop_all_process(end_process):
@@ -35,28 +35,28 @@ def stop_all_process(end_process):
     last_thread = False
     handle_error_thread = False
 
-    if(end_process):
+    if (end_process):
         kill_process(last_process)
         last_process = False
     else:
         last_process = False
 
+
 def handle_error_process():
     global is_initialize, last_process, last_thread, handle_error_thread
     for line in last_process.stdout:
         try:
-            sg.popup_no_buttons(line.decode("UTF-8"), title = "Erro na execução")
+            sg.popup_no_buttons(line.decode("UTF-8"), title="Erro na execução")
         except Exception:
             pass
 
-    if(handle_error_thread):
+    if (handle_error_thread):
         stop_all_process(False)
         window['-CODE-'].Update(disabled=False)
         window['-RUN-'].Update(disabled=False)
         window['-STOP-'].Update(disabled=True)
 
 
-    
 def list_serial_ports():
     serial_ports = list(serial.tools.list_ports.comports())
     port_names = [port.device for port in serial_ports]
@@ -84,6 +84,7 @@ def scan_cycle():
         modbus.read_input_registers()
         print("Leu as entradas")
         configuracoes_salvas = config_manager.carregar_configuracoes()  # aq
+        print(configuracoes_salvas)
         output_reg = configuracoes_salvas.get('OUTPUT')
         modbus.write_output_registers(output_reg)
         print(f"Escreveu nas saidas --> {output_reg}")
@@ -105,14 +106,14 @@ def update_IN_OUT(configuracoes_salvas):
          f'I8  --  {modbus.input_reg[0]}']
     )
     window['-OUTPUT-'].Update(
-        [f'Q1  --  {configuracoes_salvas.get("OUTPUT")[7]}',
-         f'Q2  --  {configuracoes_salvas.get("OUTPUT")[6]}',
-         f'Q3  --  {configuracoes_salvas.get("OUTPUT")[5]}',
-         f'Q4  --  {configuracoes_salvas.get("OUTPUT")[4]}',
-         f'Q5  --  {configuracoes_salvas.get("OUTPUT")[3]}',
-         f'Q6  --  {configuracoes_salvas.get("OUTPUT")[2]}',
-         f'Q7  --  {configuracoes_salvas.get("OUTPUT")[1]}',
-         f'Q8  --  {configuracoes_salvas.get("OUTPUT")[0]}']
+        [f'Q1  --  {configuracoes_salvas.get("OUTPUT")[0]}',
+         f'Q2  --  {configuracoes_salvas.get("OUTPUT")[1]}',
+         f'Q3  --  {configuracoes_salvas.get("OUTPUT")[2]}',
+         f'Q4  --  {configuracoes_salvas.get("OUTPUT")[3]}',
+         f'Q5  --  {configuracoes_salvas.get("OUTPUT")[4]}',
+         f'Q6  --  {configuracoes_salvas.get("OUTPUT")[5]}',
+         f'Q7  --  {configuracoes_salvas.get("OUTPUT")[6]}',
+         f'Q8  --  {configuracoes_salvas.get("OUTPUT")[7]}']
     )
 
 
@@ -139,14 +140,14 @@ layout_r = [
                  f'I8  --  {modbus.input_reg[0]}'],
                 no_scrollbar=True, enable_events=True, s=(25, 11), select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, key='-INPUT-')],
     [sg.Text('Saidas: ')],
-    [sg.Listbox([f'Q1  --  {output_reg[7]}',
-                 f'Q2  --  {output_reg[6]}',
-                 f'Q3  --  {output_reg[5]}',
-                 f'Q4  --  {output_reg[4]}',
-                 f'Q5  --  {output_reg[3]}',
-                 f'Q6  --  {output_reg[2]}',
-                 f'Q7  --  {output_reg[1]}',
-                 f'Q8  --  {output_reg[0]}'],
+    [sg.Listbox([f'Q1  --  {output_reg[0]}',
+                 f'Q2  --  {output_reg[1]}',
+                 f'Q3  --  {output_reg[2]}',
+                 f'Q4  --  {output_reg[3]}',
+                 f'Q5  --  {output_reg[4]}',
+                 f'Q6  --  {output_reg[5]}',
+                 f'Q7  --  {output_reg[6]}',
+                 f'Q8  --  {output_reg[7]}'],
                 no_scrollbar=True, enable_events=True, select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, s=(25, 11), key='-OUTPUT-')],
     [sg.Text('Tempo APÓS varredura(s): ')],
     [sg.Input(key='-TIMEREAD-', s=(12, 1)),
@@ -193,13 +194,13 @@ while True:
                 f'Porta Selecionada: {selected_port}', title='Porta Selecionada')
 
     elif event == 'Ajuda':
-        file = open("frontend/Help.txt")
+        file = open("texts\\Help.txt")
         Helper = file.read()
         sg.popup_scrolled(Helper, title="Helper", font=(
             "Arial", 12), size=(55, 20))
 
     elif event == "Sobre":
-        file = open("frontend/About.txt")
+        file = open("texts\\About.txt")
         About = file.read()
         sg.popup_scrolled(About, title="About", font=(
             "Arial", 12), size=(55, 20))
@@ -255,7 +256,6 @@ while True:
         last_process = Popen(["java", "-cp", "../backend/target/compilador-clp-1.0-SNAPSHOT-jar-with-dependencies.jar",
                              "iftm.compilador.clp.App", path_source_code], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
 
-
         last_thread = threading.Thread(target=scan_cycle)
         handle_error_thread = threading.Thread(target=handle_error_process)
         last_thread.start()
@@ -268,12 +268,12 @@ while True:
         window['-STOP-'].Update(disabled=True)
 
         sg.popup_ok(
-                'O programa foi parado com sucesso.', title='Parado com sucesso')
+            'O programa foi parado com sucesso.', title='Parado com sucesso')
 
     elif event == "-CLEAR-":
         window['-CODE-'].Update("")
 
 window.close()
 
-if(is_initialize):
+if (is_initialize):
     stop_all_process(True)

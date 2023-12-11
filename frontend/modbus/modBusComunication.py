@@ -30,4 +30,4 @@ class Modbus:
         return self.input_reg
 
     def write_output_registers(self, output_reg):
-        self.instrument.write_register(112, array_to_decimal(output_reg))
+        self.instrument.write_register(112, array_to_decimal(output_reg[::-1]))
