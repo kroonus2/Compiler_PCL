@@ -3,7 +3,7 @@ import json
 
 class ModbusConfigManager:
     def __init__(self):
-        self.config_file = '../storage/communication.json'
+        self.config_file = 'storage\communication.json'
 
     def carregar_configuracoes(self):
         try:
@@ -25,5 +25,3 @@ class ModbusConfigManager:
             if input_reg_atual != novo_input_reg:
                 configuracoes['INPUT'] = novo_input_reg
                 self.salvar_configuracoes(configuracoes)
-            else:
-                print("NÃO HOUVE ALTERAÇÕES NAS ENTRADAS")
