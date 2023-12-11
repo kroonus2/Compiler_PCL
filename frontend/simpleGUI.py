@@ -18,18 +18,45 @@ output_reg = [0, 0, 0, 0, 0, 0, 0, 0]
 # Create global vars
 selected_port = ""
 scan_cycle_time = 1
-last_process = last_thread = is_initialize = False
+last_process = last_thread = handle_error_thread = is_initialize = False
 
 modbus = Modbus()
-
 
 config_manager = ModbusConfigManager()
 configuracoes_salvas = config_manager.carregar_configuracoes()
 
 if configuracoes_salvas:
-    output_reg = configuracoes_salvas.get('OUTPUT', output_reg)
+    output_reg = configuracoes_salvas.get('OUTPUT', output_reg) 
 
 
+def stop_all_process(end_process):
+    global is_initialize, last_process, last_thread, handle_error_thread
+    is_initialize = False
+    last_thread = False
+    handle_error_thread = False
+
+    if(end_process):
+        kill_process(last_process)
+        last_process = False
+    else:
+        last_process = False
+
+def handle_error_process():
+    global is_initialize, last_process, last_thread, handle_error_thread
+    for line in last_process.stdout:
+        try:
+            sg.popup_no_buttons(line.decode("UTF-8"), title = "Erro na execução")
+        except Exception:
+            pass
+
+    if(handle_error_thread):
+        stop_all_process(False)
+        window['-CODE-'].Update(disabled=False)
+        window['-RUN-'].Update(disabled=False)
+        window['-STOP-'].Update(disabled=True)
+
+
+    
 def list_serial_ports():
     serial_ports = list(serial.tools.list_ports.comports())
     port_names = [port.device for port in serial_ports]
@@ -226,18 +253,17 @@ while True:
         path_source_code = create_file(source_code)
 
         last_process = Popen(["java", "-cp", "../backend/target/compilador-clp-1.0-SNAPSHOT-jar-with-dependencies.jar",
-                             "iftm.compilador.clp.App", path_source_code])
+                             "iftm.compilador.clp.App", path_source_code], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+
 
         last_thread = threading.Thread(target=scan_cycle)
+        handle_error_thread = threading.Thread(target=handle_error_process)
         last_thread.start()
+        handle_error_thread.start()
 
     elif event == "-STOP-":
-        is_initialize = False
-        last_thread = False
+        stop_all_process(True)
         window['-CODE-'].Update(disabled=False)
-        kill_process(last_process)
-        last_process = False
-        
         window['-RUN-'].Update(disabled=False)
         window['-STOP-'].Update(disabled=True)
 
@@ -248,3 +274,6 @@ while True:
         window['-CODE-'].Update("")
 
 window.close()
+
+if(is_initialize):
+    stop_all_process(True)
