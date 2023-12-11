@@ -226,6 +226,7 @@ while True:
                 'Nenhum código para salvar. Digite seu código antes de salvar.', title='Erro')
 
     elif event == '-OKBTN-':
+        scan_cycle_time = 1
         try:
             scan_cycle_time = int(values['-TIMEREAD-'])
         except ValueError:
@@ -243,7 +244,6 @@ while True:
             sg.popup_error(
                 'Não há código a ser executado.', title='Erro na Sintaxe')
             continue  # Volta ao início do loop, impedindo a execução do código
-
         is_initialize = True
         if (is_initialize):
             window['-RUN-'].Update(disabled=True)

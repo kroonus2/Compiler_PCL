@@ -11,7 +11,7 @@ public class JSONReaderThread extends Thread {
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     public Communication communicationData = new Communication();
-    public String pathFile = "C:\\Users\\Rafael\\Desktop\\CLP\\TrabalhoFinalCLP\\backend\\target\\storage\\communication.json";
+    public String pathFile = System.getProperty("user.dir") + "\\storage\\communication.json";
 
     public JSONReaderThread() {
         this.setDaemon(true);
@@ -37,7 +37,7 @@ public class JSONReaderThread extends Thread {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            ;
         }
     }
 }
