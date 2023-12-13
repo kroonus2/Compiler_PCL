@@ -158,7 +158,7 @@ layout_r = [
 ]
 
 menu_def = [['File', ['Abrir', 'Salvar',]],
-            ['Help', ['Sobre', 'Ajuda']],]
+            ['Help', ['Sobre', 'Ajuda', 'Exemplos']],]
 
 layout = [[sg.Menu(menu_def)],
           [sg.Text('Compilador CLP',  font='_22',
@@ -199,13 +199,19 @@ while True:
     elif event == 'Ajuda':
         file = open("texts\\Help.txt")
         Helper = file.read()
-        sg.popup_scrolled(Helper, title="Helper", font=(
+        sg.popup_scrolled(Helper, title="Ajuda", font=(
             "Arial", 12), size=(55, 20))
 
     elif event == "Sobre":
         file = open("texts\\About.txt")
         About = file.read()
-        sg.popup_scrolled(About, title="About", font=(
+        sg.popup_scrolled(About, title="Sobre", font=(
+            "Arial", 12), size=(55, 20))
+
+    elif event == "Exemplos":
+        file = open("texts\\CodeExample.txt")
+        About = file.read()
+        sg.popup_scrolled(About, title="Exemplos", font=(
             "Arial", 12), size=(55, 20))
 
     elif event == 'Abrir':
@@ -275,7 +281,6 @@ while True:
         window['-CLEAR-'].Update(disabled=False)
         window['-OKBTN-'].Update(disabled=False)
         window['-TIMEREAD-'].Update(disabled=False)
-
 
         sg.popup_ok(
             'O programa foi parado com sucesso.', title='Parado com sucesso')
