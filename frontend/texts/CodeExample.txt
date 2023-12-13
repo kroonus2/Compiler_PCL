@@ -1,0 +1,55 @@
+Os exemplos abaixo sao codigos feitos em lista de instrucoes, feitos para ilustrar o funcionamento do Compilador, da linguagem, alem executarem funcoes diversas:
+
+"   LD  I1
+    ST  Q1
+    LD  I2
+    ST  Q2
+    LD  I3
+    ST  Q3
+    LD  I4
+    ST  Q4
+    LD  I5
+    ST  Q5
+    LD  I6
+    ST  Q6
+    LD  I7
+    ST  Q7
+    LD  I8
+    ST  Q8  "
+O Codigo acima le uma entrada e ativa sua saida correspondente, \"Aperte I1, aciona Q1, ...\".
+
+"   LD  I1
+    OR(
+    LD  Q1
+    )
+    AND(
+    LDN I2
+    )
+    ST  Q1 "
+
+O codigo acima le a entrada I1 e ativa a saida Q1 se a entrada I2 nao estiver ativa, alem de contar com 
+uma realimentacao para manter a saida Q1 ativa enquanto I2 nao for pressionado.
+
+"   LD    I1
+    TON   T1, 2000
+    LD    T1Q
+    ST    M1
+    LD    M1
+    AND(
+    LD    I1
+    )
+    ST    Q1 "
+
+O codigo acima le a entrada I1 que ativa o timmer On_Delay por 2 segundos, apos o timmer terminar a contagem
+e setado a memoria booleana M1 e quando a memoria M1 e a entrada I1 sao ativas no mesmo tempo a saida Q1 e ativada.
+
+"   LD    I4
+    OR(
+    LD    I5
+    )
+    TOFF    T1, 2000
+    LD    T1Q
+    ST    Q4
+    ST    Q5  "
+
+O codigo acima le a entrada I4 e I5, e se alguma delas estiver ativa, entao ativar Temporizador T1 que ficara desligado por 2s e quando acabar liga as saidas Q4 e Q5 ativam.
