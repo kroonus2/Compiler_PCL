@@ -7,7 +7,7 @@ public class Palavras {
     "NE", "LT", "LE", "JMP", "JMPC", "JMPCN", "CAL", "CALC", "CALCN", "RET", "RETC", "RETCN", 
     "CTU", "BLK", "TON", "TOFF"};    
 
-    private static String[] hasLeftParModifier = {"AND", "OR", "XOR", "GT", "GE", "EQ", "NE", "LT", "LE"};
+    private static String[] hasLeftParModifier = {"AND", "ANDN", "ORN", "OR", "XOR", "GT", "GE", "EQ", "NE", "LT", "LE"};
 
     public static boolean hasModifier(String str, String mod){        
         if(mod.equals("(")){
