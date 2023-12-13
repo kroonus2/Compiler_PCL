@@ -55,6 +55,9 @@ def handle_error_process():
         window['-CODE-'].Update(disabled=False)
         window['-RUN-'].Update(disabled=False)
         window['-STOP-'].Update(disabled=True)
+        window['-CLEAR-'].Update(disabled=False)
+        window['-OKBTN-'].Update(disabled=False)
+        window['-TIMEREAD-'].Update(disabled=False)
 
 
 def list_serial_ports():
@@ -249,6 +252,9 @@ while True:
             window['-RUN-'].Update(disabled=True)
             window['-STOP-'].Update(disabled=False)
             window['-CODE-'].Update(disabled=True)
+            window['-CLEAR-'].Update(disabled=True)
+            window['-OKBTN-'].Update(disabled=True)
+            window['-TIMEREAD-'].Update(disabled=True)
 
         source_code = str(window['-CODE-'].get()+'\n')
         path_source_code = create_file(source_code)
@@ -266,6 +272,10 @@ while True:
         window['-CODE-'].Update(disabled=False)
         window['-RUN-'].Update(disabled=False)
         window['-STOP-'].Update(disabled=True)
+        window['-CLEAR-'].Update(disabled=False)
+        window['-OKBTN-'].Update(disabled=False)
+        window['-TIMEREAD-'].Update(disabled=False)
+
 
         sg.popup_ok(
             'O programa foi parado com sucesso.', title='Parado com sucesso')
