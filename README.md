@@ -4,6 +4,25 @@
 
 O projeto consiste em desenvolver um emulador de Controlador Lógico Programável (CLP) que utiliza um sistema de leitura de entradas e escrita de saídas por meio de um módulo de interface ModBus. O emulador deve ser capaz de operar em modos de programação, parado e operação, semelhantes a um CLP convencional. O programa emulador deve suportar funções lógicas básicas (NOT, OR, AND), memórias booleanas locais, temporizadores (ON DELAY e OFF DELAY) e permitir a criação de programas lógicos através de uma linguagem de programação baseada em lista de instruções.
 
+## Instalação
+
+Para instalar as bibliotecas necessárias, execute o seguinte comando no terminal:
+
+```python
+pip install -U minimalmodbus PySimplegui
+```
+```java
+JDK21 - https://www.oracle.com/br/java/technologies/downloads/#jdk21-windows
+```
+## Uso
+
+Para executar o projeto, execute o seguinte comando no terminal:
+
+```python
+python simpleGUI.py
+```
+
+
 ## Funcionalidades
 
 - **Funções Lógicas Básicas:**
