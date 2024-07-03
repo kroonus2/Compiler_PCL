@@ -89,7 +89,8 @@ def scan_cycle():
         configuracoes_salvas = config_manager.carregar_configuracoes()  # aq
         print(configuracoes_salvas)
         output_reg = configuracoes_salvas.get('OUTPUT')
-        modbus.write_output_registers(output_reg)
+        if output_reg is not None:
+            modbus.write_output_registers(output_reg)
         # print(f"Escreveu nas saidas --> {output_reg}")
         config_manager.atualizar_input_reg(modbus.input_reg)
         update_IN_OUT(configuracoes_salvas)
@@ -237,7 +238,7 @@ while True:
     elif event == '-OKBTN-':
         scan_cycle_time = 1
         try:
-            scan_cycle_time = int(values['-TIMEREAD-'])
+            scan_cycle_time = float(values['-TIMEREAD-'])
         except ValueError:
             scan_cycle_time = 1
             sg.popup_error(

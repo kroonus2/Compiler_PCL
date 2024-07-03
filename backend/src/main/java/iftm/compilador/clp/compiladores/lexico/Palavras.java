@@ -5,7 +5,7 @@ public class Palavras {
     private static String[] words = {"LD", "LDN","ST","STN", "S", "R", "AND",
      "ANDN", "OR", "ORN", "XOR", "XORN","ADD", "SUB", "MUL", "DIV", "GT", "GE", "EQ",
     "NE", "LT", "LE", "JMP", "JMPC", "JMPCN", "CAL", "CALC", "CALCN", "RET", "RETC", "RETCN", 
-    "CTU", "BLK", "TON", "TOFF"};    
+    "CTU","CTD", "BLK", "TON", "TOFF"};    
 
     private static String[] hasLeftParModifier = {"AND", "ANDN", "ORN", "OR", "XOR", "GT", "GE", "EQ", "NE", "LT", "LE"};
 

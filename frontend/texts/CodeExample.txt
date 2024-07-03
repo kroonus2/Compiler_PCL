@@ -53,3 +53,50 @@ e setado a memoria booleana M1 e quando a memoria M1 e a entrada I1 sao ativas n
     ST    Q5  "
 
 O codigo acima le a entrada I4 e I5, e se alguma delas estiver ativa, entao ativar Temporizador T1 que ficara desligado por 2s e quando acabar liga as saidas Q4 e Q5 ativam.
+
+LD    I1
+
+CTU   C1, 5
+LD C1Q
+ST Q1
+
+LD I8
+R C1
+
+LD    C1Q
+TON   T2, 500
+LD T2Q
+ST Q2
+
+LD    T2Q
+TON   T3, 500
+LD T3Q
+ST Q3
+
+LD    T3Q
+TON   T4, 500
+LD T4Q
+ST Q4
+
+LD    T4Q
+TON   T5, 500
+LD T5Q
+ST Q5
+
+LD   T5Q
+TON   T6, 500
+LD T6Q
+ST Q6
+
+LD    T6Q
+TON   T7, 500
+LD T7Q
+ST Q7
+
+LD    T7Q
+TON   T8, 500
+LD T8Q
+ST Q8
+
+
+O codigo verifica a trasicao da entrada i1 e caso haja a transica de 0 para 1 5 vezes, o timer t2 vai esperar 500ms e ligar o saida q2 e assim sucessimante ate a saida q8.

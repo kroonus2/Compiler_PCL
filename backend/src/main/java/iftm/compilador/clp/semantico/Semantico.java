@@ -33,18 +33,22 @@ public class Semantico {
 
     // registradores de entrada, saída e memória
     private int[] input_reg = { 0, 0, 0, 0, 0, 0, 0, 0 }; // I8, I7, I6, ...
+    private int[] previous_input_reg = {0, 0, 0, 0, 0, 0, 0, 0}; // Estados anteriores das entradas
     private int[] output_reg = { 0, 0, 0, 0, 0, 0, 0, 0 }; // Q8, Q7, Q6, ...
-    private int[] memory_reg = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0 }; // M0, M1, M2, ...
-    private int[] counters = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    private int[] timers = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // T0,
+    private int[] previous_output_reg = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    private int[] memory_reg = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // M0, M1, M2, ...
+    private int[] counters = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};;
+    private int[] previous_accumulator_counters = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};;
+    private int[] timers = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // T0,
                                                                                                                          // T1,
                                                                                                                          // T2,
                                                                                                                          // ...
-    private int[] timers_preset = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0 }; // T0.PS, T1.PS, T2.PS, ...
-    private int[] timers_output = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0 }; // T0.Q, T1.Q, T2.Q, ...
+
+    private int[] counters_preset = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};;
+    private int[] counters_output = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};;
+
+    private int[] timers_preset = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // T0.PS, T1.PS, T2.PS, ...
+    private int[] timers_output = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};// T0.Q, T1.Q, T2.Q, ...
 
     private int accumulator = 0;
 
@@ -54,9 +58,11 @@ public class Semantico {
     private static final int TYPE_MEMORY = 2;
     private static final int TYPE_INTEGER = 3;
     private static final int TYPE_COUNTER = 4;
-    private static final int TYPE_TIMER = 5;
-    private static final int TYPE_TIMER_PRESET = 6;
-    private static final int TYPE_TIMER_OUTPUT = 7;
+    private static final int TYPE_COUNTER_PRESET = 5;
+    private static final int TYPE_COUNTER_OUTPUT = 6;
+    private static final int TYPE_TIMER = 7;
+    private static final int TYPE_TIMER_PRESET = 8;
+    private static final int TYPE_TIMER_OUTPUT = 9;
 
     // utilizado para processar os identificadores
     private int type; // 0 = entrada, 1 = saída, 2 = memória
@@ -124,6 +130,7 @@ public class Semantico {
         operations.put("R", this::reset);
         operations.put("RET", this::ret);
         operations.put("CTU", this::ctu);
+        operations.put("CTD", this::ctd);
         operations.put("TON", this::ton);
         operations.put("TOFF", this::toff);
         operations.put("BLK", this::blk);
@@ -143,6 +150,22 @@ public class Semantico {
                                 int timer_preset_index = Integer
                                         .parseInt(tokenCId.getValor().getTexto().replaceAll("\\D", ""));
                                 timers_preset[timer_preset_index-1] = token.getValor().getInteiro()/2;
+                            }
+                        }
+                    }
+                }
+
+                else if (token.getValor().getTexto().equals("CTU") || token.getValor().getTexto().equals("CTD")) {
+                    int x = i;
+                    Token tokenCId = Tokens.get(++x);
+                    if (tokenCId.getClasse() == Classe.cId) {
+                        token = Tokens.get(++x);
+                        if (token.getClasse() == Classe.cVirg) {
+                            token = Tokens.get(++x);
+                            if (token.getClasse() == Classe.cInt) {
+                                int counter_preset_index = Integer
+                                        .parseInt(tokenCId.getValor().getTexto().replaceAll("\\D", ""));
+                                counters_preset[counter_preset_index-1] = token.getValor().getInteiro();
                             }
                         }
                     }
@@ -363,17 +386,66 @@ public class Semantico {
             error("Não ha ponto de retorno.");
     }
 
+    // Função CTU (Contador Crescente)
     private void ctu() {
         int[] register = getRegisterByType(type);
         if (register != null && type == TYPE_COUNTER) {
             if (accumulator >= 1) {
-                register[port] += 1;
-                accumulator = register[port];
+                // System.out.println(register[port]);
+                if (previous_accumulator_counters[port] != accumulator) { // Verifica se houve mudança no accumulator
+                    previous_accumulator_counters[port] = accumulator;
+                    register[port] += 1;
+                }
+                
+                if (register[port] >= counters_preset[port]) { // Verifica se atingiu o valor de preset
+                    counters_output[port] = 1; // Define a saída do contador como 1
+                } else {
+                    counters_output[port] = 0;
+                }
+            }
+            else{
+                previous_accumulator_counters[port] = accumulator;
+                if (register[port] >= counters_preset[port]) { // Verifica se atingiu o valor de preset
+                    counters_output[port] = 1; // Define a saída do contador como 1
+                } else {
+                    counters_output[port] = 0;
+                }
             }
         } else {
             error("Expressao invalida.");
         }
     }
+
+    // Função CTD (Contador Decrescente)
+    private void ctd() {
+        int[] register = getRegisterByType(type);
+        if (register != null && type == TYPE_COUNTER) {
+            if (accumulator >= 1) {
+                
+                if (previous_accumulator_counters[port] != accumulator) {
+                    previous_accumulator_counters[port] = accumulator;
+                    register[port] -= 1;
+                }
+                
+                if (register[port] + counters_preset[port] <= 0) { 
+                    counters_output[port] = 1; 
+                } else {
+                    counters_output[port] = 0;
+                }
+            }
+            else{
+                previous_accumulator_counters[port] = accumulator;
+                if (register[port] + counters_preset[port] <= 0) { 
+                    counters_output[port] = 1; 
+                } else {
+                    counters_output[port] = 0;
+                }
+            }
+        } else {
+            error("Expressao invalida.");
+        }
+    }
+
 
     private void ton() {
         int[] register = getRegisterByType(type);
@@ -482,6 +554,10 @@ public class Semantico {
                 return memory_reg;
             case TYPE_COUNTER:
                 return counters;
+            case TYPE_COUNTER_PRESET:
+                return counters_preset;
+            case TYPE_COUNTER_OUTPUT:
+                return counters_output;
             case TYPE_TIMER:
                 return timers;
             case TYPE_TIMER_PRESET:
@@ -512,6 +588,8 @@ public class Semantico {
                         type = TYPE_OUTPUT;
                     } else if (id.charAt(0) == 'M') {
                         type = TYPE_MEMORY;
+                    } else if (id.charAt(0) == 'C' && id.charAt(id.length() - 1) == 'Q') {
+                        type = TYPE_COUNTER_OUTPUT;
                     } else if (id.charAt(0) == 'C') {
                         type = TYPE_COUNTER;
                     } else if (id.charAt(0) == 'T' && id.charAt(id.length() - 1) == 'Q') {
@@ -529,7 +607,7 @@ public class Semantico {
             try {
                 port = Integer.parseInt(num.replaceAll("[^0-9]", "")) - 1;
                 int maxLength = 0;
-                if (type == TYPE_INPUT || type == TYPE_OUTPUT || type == TYPE_COUNTER) {
+                if (type == TYPE_INPUT || type == TYPE_OUTPUT) {
                     maxLength = jsonReader.communicationData.INPUT.length - 1;
                 } else {
                     maxLength = memory_reg.length - 1;

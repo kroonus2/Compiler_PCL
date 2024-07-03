@@ -1,6 +1,5 @@
 import json
 
-
 class ModbusConfigManager:
     def __init__(self):
         self.config_file = 'storage\communication.json'
